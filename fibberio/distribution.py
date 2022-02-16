@@ -1,5 +1,4 @@
 import abc
-from typing import Any
 
 
 class Distribution(metaclass=abc.ABCMeta):
@@ -9,5 +8,5 @@ class Distribution(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractclassmethod
-    def generate(self) -> Any:
+    def generate(self) -> float:
         pass

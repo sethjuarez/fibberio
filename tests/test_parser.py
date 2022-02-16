@@ -1,13 +1,12 @@
 import pytest
-from fibberio import Parser
+from fibberio import SourceParser
 
 
 @pytest.fixture
-def grammar():
-    return Parser()
+def parser():
+    return SourceParser()
 
 
-def test_source_parse():
-    p = Parser()
-    o = p.parse("expr([12, 59), float)")
+def test_source_parse(parser):
+    o = parser.parse("expr((100000, 200000], float(2))")
     print(o)

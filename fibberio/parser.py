@@ -1,28 +1,33 @@
 from parsimonious.grammar import Grammar
 
+_ebnf = r"""
+expr        = src / func
+src         = src_t beg_open word end_open
+func        = fun_t beg_open range comma type end_open
+range       = range_open floatd comma floatd range_close
+range_open  = beg_open / beg_closed
+range_close = end_open / end_closed
+beg_open    = ws "(" ws
+end_open    = ws ")" ws
+beg_closed  = ws "[" ws
+end_closed  = ws "]" ws
+comma       = ws "," ws
+src_t       = "src"
+fun_t       = "expr"
+type        = int / float
+int         = "int"
+float       = "float" paren?
+paren       = beg_open digits end_open
+ws          = ~r"\s*"
+word        = ~r"[-\w]+"
+digits      = ~r"\d+"
+floatd      = ~r"[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?"
+"""
 
-class Parser:
+
+class SourceParser:
     def __init__(self):
-        self.grammar = Grammar(
-          r"""
-          text        =  src / func
-          src         = src func_start name_exp func_end
-          func        = expr func_start func_exp func_end
-          func_exp     = func_range comma type
-          func_range  = func_start num_exp comma num_exp func_end
-          func_start  = "[" / "("
-          func_end    = "]" / ")"
-          comma       = ws? "," ws?
-          src         = "src"
-          expr        = "expr"
-          type        = int / float
-          int         = "int"
-          float       = "float"
-          ws          = ~"\s*"
-          num_exp     = ~"[0-9]*"i
-          name_exp    = ~"[A-Z 0-9]*"i
-          """
-        )
+        self.grammar = Grammar(_ebnf)
 
     def parse(self, source):
         return self.grammar.parse(source)
