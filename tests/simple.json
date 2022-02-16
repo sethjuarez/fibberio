@@ -1,0 +1,48 @@
+{
+  "sources": [
+    {
+      "id": "names",
+      "data": "./full_names.csv"
+    }
+  ],
+  "features": [
+    {
+      "feature": "FirstName",
+      "source": "src(names)",
+      "distribution": "uniform"
+    },
+    {
+      "feature": "LastName",
+      "source": "src(names)",
+      "distribution": "uniform"
+    },
+    {
+      "feature": "Age",
+      "source": "expr((14, 85], int)",
+      "distribution:": "normal"
+    },
+    {
+      "feature": "TabsVSpaces",
+      "source": ["tabs", "spaces", "dots"],
+      "distribution": [25, 75],
+      "conditional": {
+        "feature": "subtabspaces",
+        "source": "expr([12, 59], float)",
+        "distribution": ["uniform", "normal(0.2)", "normal(12.2, 0.5)"]
+      }
+    },
+    {
+      "feature": "ScrumVAgile",
+      "source": ["scrum", "agile"],
+      "distribution": [25, 75],
+      "conditional": {
+        "feature": "submethod",
+        "source": ["cheese", "pepper", "macaroni", "pretzels"],
+        "distribution": [
+          [0, 0, 2, 20], 
+          [10, 20, 2, 1]
+        ]
+      }
+    }
+  ]
+}
