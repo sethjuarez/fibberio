@@ -87,21 +87,21 @@ In this case, as fibber generates a data point if `NumberFeature` fits the first
   "features": [
     {
       "feature": "FirstName,LastName",
-      "source": "src(names)",
+      "source": "names",
       "distribution": "uniform"
     },
     {
       "feature": "Age",
-      "source": "expr((14, 85], int)",
+      "source": "(14, 85] -> int",
       "distribution:": "normal"
     },
     {
       "feature": "TabsVSpaces",
       "source": ["tabs", "spaces", "dots"],
-      "distribution": [25, 75],
+      "distribution": [25, 75, 200],
       "conditional": {
         "feature": "subtabspaces",
-        "source": "expr([12, 59], float)",
+        "source": "[12, 59] -> float(2)",
         "distribution": ["uniform", "normal(0.2)", "normal(12.2, 0.5)"]
       }
     },
@@ -118,7 +118,7 @@ In this case, as fibber generates a data point if `NumberFeature` fits the first
         ],
         "conditional": {
           "feature": "subsubfeature",
-          "source":"expr((100000, 200000], float)",
+          "source":"(100000, 200000] -> float",
           "distribution": [
             "uniform",
             "normal(0.2)",
@@ -130,19 +130,19 @@ In this case, as fibber generates a data point if `NumberFeature` fits the first
     },
     {
       "feature": "NumberFeature",
-      "source": "expr((100000, 200000], float(2))",
+      "source": "(100000, 200000] -> float(2)",
       "distribution": "uniform",
       "conditional": {
         "feature": "subfeature",
         "source": ["carts", "horses", "wheels"],
         "distribution": [
-          "expr(150000 < x <= 18000)",
-          "expr(x < 15000)",
-          "expr(*)"
+          "(150000, 18000]",
+          "[*, 15000)",
+          "*"
         ],
         "conditional": {
           "feature": "subsubfeature",
-          "source":"expr((100000, 200000], float)",
+          "source":"(100000, 200000]->float",
           "distribution": [
             "uniform",
             "normal(0.2)",
