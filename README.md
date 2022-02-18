@@ -35,13 +35,13 @@ Distributions fall into two categories: discrete and continuous
   "distribution": [25, 75, 200],
 }
 ```
-The `TabsVSpaces` feature has three discrete items in the source. The distributional densities needs to also have a cardinality of 3. These values are normalized in the system and selected using a uniform distribution mapped to the respective densities.
+The `TabsVSpaces` feature has three discrete items in the source. The distributional densities need to also have a cardinality of 3. These values are normalized in the system and selected using a uniform distribution mapped to the respective densities.
 
 2.  (**Continuous**) Continuous distributions are sampled according to the respective distribution class. For example:
 ```
-distribution_class(1,2, prop1=2, prop2='seismic')
+distribution_class(prop1=2, prop2='seismic')
 ```
-will create 'distribution_class' class by extracting `args` as `[1, 2]` and `argsv` as
+will create 'distribution_class' class by extracting `argsv` as
 ```
 {
   "prop1": 2,
@@ -50,8 +50,10 @@ will create 'distribution_class' class by extracting `args` as `[1, 2]` and `arg
 ```
 and instantiating by:
 ```
-distribution_class(*args, **argsv)
+distribution_class(**argsv)
 ```
+
+I am optimizing for readibility as opposed to brevity. This requires the class to have an `__init()__` with default named parameters.
 
 ## Conditionals
 

@@ -1,4 +1,5 @@
 import abc
+from pathlib import Path
 from typing import Any
 
 from .distribution import Distribution
@@ -9,27 +10,29 @@ class Source(metaclass=abc.ABCMeta):
     def generate(distribution: Distribution) -> Any:
         pass
 
-
-class FileSource(Source):
-    def __init__(self, file: str) -> None:
-        self.file = file
-        self.thing = {
-            "prop1": 2,
-            "prop2": 'setting'
-        }
-        # load
+    @abc.abstractclassmethod
+    def validate(self) -> bool:
         pass
+
+
+class InlineSource(Source):
+    def __init__(self) -> None:
+        self.reference = ""
+        self.path = Path(".")
 
     def generate(distribution: Distribution) -> Any:
         pass
 
+    def validate(self) -> bool:
+        # check reference
+        pass
+
+    def __repr__(self) -> str:
+        return f'InlineSource({self.reference}, {self.path})'
+
 
 class RangeSource(Source):
     def __init__(self) -> None:
-        # [a, b] the closed interval {x ∈ ℝ : a ⩽ x ⩽ b}
-        # [a, b) the interval {x ∈ ℝ : a ⩽ x < b}
-        # (a, b] the interval {x ∈ ℝ : a < x ⩽ b}
-        # (a, b) the open interval {x ∈ ℝ : a < x < b}
         self.type = "float"
         self.start = 0.0
         self.end = 1.0
