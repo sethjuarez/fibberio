@@ -9,6 +9,7 @@ python = "^3.9"
 click = "^8.0.3"
 PyYAML = "^6.0"
 parsimonious = "^0.8.1"
+numpy = "^1.22.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
