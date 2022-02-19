@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from .feature import Feature
-from typing import Dict, List
+from typing import Dict, Iterator, List
 from .parser import ItemParser
 from .distribution import DiscreteDistribution, Distribution
 from .source import DiscreteSource, FileSource, RangeSource, Source
@@ -18,12 +18,12 @@ class Task:
 
         p = json.loads(self.task.read_text())
 
-        # load inline file sources
+        # load sources
         self.files: Dict[str, FileSource] = {}
         self._load_sources(p["sources"])
 
         # load features
-        self.features: List[Source] = []
+        self.features: List[Feature] = []
         self.parser = ItemParser()
         self._load_features(p["features"])
 
@@ -90,6 +90,7 @@ class Task:
             else:
                 return cl()
 
-    def process(self) -> None:
-        x = self.task
-        return x
+    def generate_headers(self) -> Iterator[str]:
+        for f in self.features:
+            for fi in f.target:
+                yield fi

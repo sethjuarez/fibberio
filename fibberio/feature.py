@@ -37,3 +37,4 @@ class Feature:
     def distribution(self, distribution: Distribution) -> None:
         self._distribution = distribution
         self._validate()
+

@@ -39,13 +39,13 @@ The `TabsVSpaces` feature has three discrete items in the source. The distributi
 
 2.  (**Continuous**) Continuous distributions are sampled according to the respective distribution class. For example:
 ```
-distribution_class(prop1=2, prop2='seismic')
+distribution_class(prop1=2, prop2=seismic)
 ```
 will create 'distribution_class' class by extracting `argsv` as
 ```
 {
   "prop1": 2,
-  "prop2": 'seismic'
+  "prop2": "seismic"
 }
 ```
 and instantiating by:
