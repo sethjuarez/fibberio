@@ -1,10 +1,9 @@
 import json
+import pandas as pd
 from pathlib import Path
 from .feature import Feature
-from typing import Dict, Iterator, List
-from .parser import ItemParser
-from .distribution import DiscreteDistribution, Distribution
-from .source import DiscreteSource, FileSource, RangeSource, Source
+from .source import PandasSource
+from .distribution import Distribution
 
 
 class Task:
@@ -19,12 +18,11 @@ class Task:
         p = json.loads(self.task.read_text())
 
         # load sources
-        self.files: Dict[str, FileSource] = {}
+        self.files: dict[str, PandasSource] = {}
         self._load_sources(p["sources"])
 
         # load features
-        self.features: List[Feature] = []
-        self.parser = ItemParser()
+        self.features: list[Feature] = []
         self._load_features(p["features"])
 
     def _load_sources(self, sources) -> None:
@@ -32,65 +30,56 @@ class Task:
             if item["id"] in self.files:
                 raise KeyError(f'{item["id"]} already exists')
 
-            fs = FileSource()
-            fs.reference = item["id"]
-            fp = Path(item["data"])
+            ref = item.pop("id")
+            fp = Path(item.pop("path"))
             if not fp.is_absolute():
                 fp = self.task.parent.joinpath(fp)
 
-            fs.path = fp.absolute().resolve()
-            if not fs.path.exists():
-                raise FileNotFoundError(
-                    f'source "{item["id"]}" file {item["data"]} does not exist'
-                )
-            self.files[item["id"]] = fs
+            fp = fp.absolute().resolve()
+            if not fp.exists():
+                raise FileNotFoundError(f'source "{ref}" file {fp} does not exist')
+
+            call: str = next(iter(item))
+            self.files[ref] = PandasSource(path=fp, call=call, argsv=item[call])
 
     def _load_features(self, features) -> None:
         for item in features:
             f = Feature()
-            f.target = item["feature"].split(",")
+            f.target = [f.strip() for f in item["target"].split(",")]
 
-            # source
-            f.source = self._load_source(item["source"])
+            # inline source ref
+            if "source" in item:
+                if item["source"] not in self.files:
+                    raise KeyError(f"{item['source']} source reference does not exist")
+                f.source = self.files[item["source"]]
 
             # distribution
-            f.distribution = self._load_distribution(item["distribution"])
+            if "distribution" in item:
+                f.distribution = self._load_distribution(item["distribution"])
 
             self.features.append(f)
 
-    def _load_source(self, source) -> Source:
-        if type(source) == list:
-            # discrete source
-            return DiscreteSource(source)
-        else:
-            parsed = self.parser.parse(source)
-            if parsed.name == "__range":
-                return RangeSource(
-                    start_open=parsed.start_open,
-                    start=parsed.start,
-                    end=parsed.end,
-                    end_open=parsed.end_open,
-                    val_type=parsed.val_type,
-                    precision=parsed.precision,
-                )
-            else:
-                if parsed.name not in self.files:
-                    raise KeyError(f"{parsed.name} source reference does not exist")
-                return self.files[parsed.name]
+    def _load_distribution(self, d: dict) -> Distribution:
+        if len(d.keys()) != 1:
+            raise KeyError(f"incorrect items in {d}")
 
-    def _load_distribution(self, distribution) -> Distribution:
-        if type(distribution) == list:
-            return DiscreteDistribution(distribution)
-        else:
-            parsed = self.parser.parse(distribution)
-            clsname = f'{parsed.name.capitalize()}Distribution'
-            cl = getattr(self.module, clsname)
-            if len(parsed.argsv) > 0:
-                return cl(**parsed.argsv)
-            else:
-                return cl()
+        clsname: str = next(iter(d))
+        argsv = d[clsname]
 
-    def generate_headers(self) -> Iterator[str]:
-        for f in self.features:
-            for fi in f.target:
-                yield fi
+        cl = getattr(self.module, clsname.capitalize())
+        if len(argsv) > 0:
+            return cl(**argsv)
+        else:
+            return cl()
+
+    def headers(self) -> list:
+        return [fi for f in self.features for fi in f.target]
+
+    def generate_row(self) -> list:
+        return [v for f in self.features for v in f.generate()]
+
+    def generate(self, count: int) -> pd.DataFrame:
+        return pd.DataFrame(
+            [self.generate_row() for _ in range(count)],
+            columns=[f for f in self.headers()],
+        )

@@ -1,49 +1,52 @@
 import abc
 import numpy as np
-from typing import Union
+from time import time
+from typing import Any, Union
 
 
 class Distribution(metaclass=abc.ABCMeta):
+    def __init__(self) -> None:
+        self.rng = np.random.default_rng(int(time() * 1000))
 
     @abc.abstractclassmethod
-    def parse(expr: str) -> bool:
-        pass
-
-    @abc.abstractclassmethod
-    def generate(self) -> float:
+    def generate(self) -> Any:
         pass
 
 
-class DiscreteDistribution(Distribution):
-    def __init__(self, distribution: list[Union[float, int]] = [0]) -> None:
-        self.distribution = np.array(distribution, dtype=np.float16)
+class Discrete(Distribution):
+    def __init__(self, items: list[Any], distribution: list[Union[float, int]]) -> None:
+        super().__init__()
+        self.distribution = np.array(distribution, dtype=np.float32)
         self.normalized = self.distribution / np.sum(self.distribution)
+        self.items = items
 
-    def parse(expr: str) -> bool:
-        pass
-
-    def generate(self) -> float:
-        pass
+    def generate(self) -> Any:
+        return self.rng.choice(self.items, p=self.normalized)
 
 
-class UniformDistribution(Distribution):
-    def __init__(self, ) -> None:
-        pass
+class Uniform(Distribution):
+    def __init__(
+        self, low: float, high: float, itype: str = "float", precision: int = 2
+    ) -> None:
+        super().__init__()
+        self.low = low
+        self.high = high
+        self.itype = itype
+        self.precision = precision
 
-    def parse(expr: str) -> bool:
-        pass
+    def generate(self) -> Union[float, int]:
+        if self.itype == "float":
+            d = self.rng.uniform(self.low, self.high)
+            return round(float(d), self.precision)
+        else:
+            return self.rng.integers(self.low, self.high)
 
-    def generate(self) -> float:
-        pass
 
-
-class NormalDistribution(Distribution):
-    def __init__(self, mean=0.5, stddev=.1) -> None:
+class Normal(Distribution):
+    def __init__(self, mean: float = 0, stddev: float = 1.0) -> None:
+        super().__init__()
         self.mean = mean
         self.stddev = stddev
 
-    def parse(expr: str) -> bool:
-        pass
-
     def generate(self) -> float:
-        pass
+        return self.rng.normal(loc=self.mean, scale=self.stddev)

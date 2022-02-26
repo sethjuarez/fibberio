@@ -1,65 +1,21 @@
 import abc
-from typing import Any
+import pandas as pd
 from pathlib import Path
-from .distribution import Distribution
 
 
 class Source(metaclass=abc.ABCMeta):
-    @abc.abstractclassmethod
-    def generate(distribution: Distribution) -> Any:
-        pass
-
-    @abc.abstractclassmethod
-    def validate(self) -> bool:
-        pass
+    pass
 
 
-class FileSource(Source):
-    def __init__(self) -> None:
-        self.reference = ""
-        self.path = Path(".")
+class PandasSource(Source):
+    def __init__(self, path: Path, call: str, argsv: dict) -> None:
+        self.path = path
+        cl = getattr(pd, call)
+        if len(argsv) > 0:
+            self.df: pd.DataFrame = cl(path, **argsv)
+        else:
+            self.df: pd.DataFrame = cl(path)
 
-    def generate(distribution: Distribution) -> Any:
-        pass
-
-    def validate(self) -> bool:
-        # check reference
-        pass
-
-    def __repr__(self) -> str:
-        return f"InlineSource({self.reference}, {self.path})"
-
-
-class RangeSource(Source):
-    def __init__(
-        self,
-        start_open: bool = False,
-        start: float = 0,
-        end: float = 0,
-        end_open: bool = False,
-        val_type: str = "float",
-        precision: int = 2
-    ) -> None:
-        self.start_open = start_open
-        self.start = start
-        self.end = end
-        self.end_open = end_open
-        self.type = val_type
-        self.precision = precision
-
-    def generate(distribution: Distribution) -> Any:
-        pass
-
-    def validate(self) -> bool:
-        pass
-
-
-class DiscreteSource(Source):
-    def __init__(self, source: list = []) -> None:
-        self.source = source
-
-    def generate(distribution: Distribution) -> Any:
-        pass
-
-    def validate(self) -> bool:
-        pass
+    def generate(self, features: list[str]) -> list:
+        r = self.df.sample()
+        return [r[item].values[0] for item in features]
