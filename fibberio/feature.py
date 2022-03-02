@@ -13,3 +13,11 @@ class Feature:
             return [f for f in self.source.generate(self.target)]
         else:
             return [self.distribution.generate() for _ in self.target]
+
+
+class Conditional(Feature):
+    def __init__(self) -> None:
+        self.__init__()
+        self.distribution: list[Distribution] = []
+
+    

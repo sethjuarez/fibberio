@@ -24,3 +24,10 @@ def test_generation():
     task = Task(f)
     df: pd.DataFrame = task.generate(1000)
     assert df.count().Age == 1000
+
+
+def test_simple_cond():
+    f = f"{BASE_PATH}/data/simple.json"
+    task = Task(f)
+    df: pd.DataFrame = task.generate(1000)
+    assert df.count().Age == 1000

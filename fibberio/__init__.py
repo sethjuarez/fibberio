@@ -1,7 +1,7 @@
 __version__ = "0.1.3"
 
 from .task import Task
-from .parser import ItemParser, ParseResult
+from .range import RangeParser, Range
 from .distribution import (
     Distribution,
     Uniform,
@@ -10,8 +10,8 @@ from .distribution import (
 )
 
 __all__ = [
-    "ItemParser",
-    "ParseResult",
+    "RangeParser",
+    "Range",
     "Task",
     "Distribution",
     "Uniform",

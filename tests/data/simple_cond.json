@@ -1,0 +1,66 @@
+{
+  "sources": [
+    {
+      "id": "names",
+      "path": "./full_names.csv",
+      "read_csv": {
+        "encoding": "unicode_escape",
+        "engine": "python"
+      }
+    }
+  ],
+  "features": [
+    {
+      "target": "FirstName, LastName",
+      "source": "names"
+    },
+    {
+      "target": "Age",
+      "distribution": {
+        "normal": {
+          "mean": 25,
+          "stddev": 1.2
+        }
+      }
+    },
+    {
+      "target": "Farther",
+      "distribution": {
+        "uniform" : {
+          "low": 14,
+          "high": 85,
+          "itype": "float",
+          "precision": 2
+        }
+      }
+    },
+    {
+      "target": "TabsVSpaces",
+      "distribution": {
+        "discrete": {
+          "items": ["tabs", "spaces"],
+          "distribution": [23, 2344] 
+        }
+      },
+      "conditional" : {
+        "target": "Score",
+        "distribution": [
+          {
+            "uniform": {
+              "low": 5,
+              "high": 25,
+              "itype": "float",
+              "precision": 2
+            }
+          },
+          {
+            "normal": {
+              "mean": 35,
+              "stddev": 0.5
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
