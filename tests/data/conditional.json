@@ -1,0 +1,128 @@
+{
+    "sources": [
+        {
+            "id": "names",
+            "path": "./full_names.csv",
+            "read_csv": {
+                "encoding": "unicode_escape",
+                "engine": "python"
+            }
+        }
+    ],
+    "dataset": [
+        {
+            "feature": {
+                "id": "name",
+                "distribution": {
+                    "source": {
+                        "target": "FirstName, LastName",
+                        "id": "names"
+                    }
+                }
+            }
+        },
+        {
+            "feature": {
+                "id": "age",
+                "distribution": {
+                    "normal": {
+                        "mean": 25,
+                        "stddev": 1.2
+                    }
+                }
+            }
+        },
+        {
+            "feature": {
+                "id": "farther",
+                "distribution": {
+                    "uniform": {
+                        "low": 14,
+                        "high": 85,
+                        "itype": "float",
+                        "precision": 2
+                    }
+                },
+                "conditional": {
+                    "id": "score",
+                    "distribution": [
+                        {
+                            "condition": "[14, 65)",
+                            "uniform": {
+                                "low": 5,
+                                "high": 25,
+                                "itype": "float",
+                                "precision": 2
+                            }
+                        },
+                        {
+                            "condition": "[65, *)",
+                            "normal": {
+                                "mean": 35,
+                                "stddev": 0.5
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "feature": {
+                "id": "TabsVSpaces",
+                "distribution": {
+                    "discrete": {
+                        "items": ["tabs", "spaces"],
+                        "distribution": [23, 2344]
+                    }
+                },
+                "conditional": {
+                    "id": "score",
+                    "distribution": [
+                        {
+                            "condition": "tabs",
+                            "uniform": {
+                                "low": 5,
+                                "high": 25,
+                                "itype": "float",
+                                "precision": 2
+                            }
+                        },
+                        {
+                            "condition": "spaces",
+                            "normal": {
+                                "mean": 35,
+                                "stddev": 0.5
+                            }
+                        }
+                    ],
+                    "conditional": {
+                        "id": "accept",
+                        "distribution": [
+                            {
+                                "condition": "[14, 25)",
+                                "discrete": {
+                                    "items": ["True", "False"],
+                                    "distribution": [23, 2344]
+                                }
+                            },
+                            {
+                                "condition": "[25, *]",
+                                "discrete": {
+                                    "items": ["True", "False"],
+                                    "distribution": [2202, 10]
+                                }
+                            },
+                            {
+                                "condition": "*",
+                                "discrete": {
+                                    "items": ["True", "False"],
+                                    "distribution": [1, 2433]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

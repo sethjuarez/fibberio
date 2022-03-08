@@ -98,7 +98,7 @@ def test_parser(source: str, actual: Range):
         ("[1.1, *)", 20000, True),
         ("*", 42, True),
         ("1", 1, True),
-        ("1", 0.9999, False),
+        ("1", 0.9999, True),
         ("1", 1.11, True),
         ("23.2", 23.2, True),
         ("23.2", 23.1, False),

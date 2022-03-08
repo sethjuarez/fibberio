@@ -38,8 +38,9 @@ class Range:
             return True
 
         # type and precision corrections
+        # use std mathematical rounding
         if self.val_type == "int":
-            item = int(item)
+            item = int(round(item, 0))
 
         if self.precision > 0 and self.val_type == "float":
             item = round(item, self.precision)

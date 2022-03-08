@@ -1,0 +1,90 @@
+dataset:
+- feature:
+    id: name
+    distribution:
+      source:
+        id: names
+        target: FirstName, LastName
+- feature:
+    id: age
+    distribution:
+      normal:
+        mean: 25
+        stddev: 1.2
+- feature:
+    id: farther
+    distribution:
+      uniform:
+        high: 85
+        itype: float
+        low: 14
+        precision: 2
+    conditional:
+      id: score
+      distribution:
+      - condition: '[14, 65)'
+        uniform:
+          high: 25
+          itype: float
+          low: 5
+          precision: 2
+      - condition: '[14, 65)'
+        normal:
+          mean: 35
+          stddev: 0.5
+- feature:
+    id: TabsVSpaces
+    distribution:
+      discrete:
+        distribution:
+        - 23
+        - 2344
+        items:
+        - tabs
+        - spaces
+    conditional:
+      id: score
+      distribution:
+      - condition: tabs
+        uniform:
+          high: 25
+          itype: float
+          low: 5
+          precision: 2
+      - condition: spaces
+        normal:
+          mean: 35
+          stddev: 0.5
+      conditional:
+        id: accept
+        distribution:
+        - condition: '[14, 25)'
+          discrete:
+            distribution:
+            - 23
+            - 2344
+            items:
+            - 'True'
+            - 'False'
+        - condition: '[25, *]'
+          discrete:
+            distribution:
+            - 2202
+            - 10
+            items:
+            - 'True'
+            - 'False'
+        - condition: '*'
+          discrete:
+            distribution:
+            - 1
+            - 2433
+            items:
+            - 'True'
+            - 'False'
+sources:
+- id: names
+  path: ./full_names.csv
+  read_csv:
+    encoding: unicode_escape
+    engine: python

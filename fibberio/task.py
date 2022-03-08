@@ -72,6 +72,9 @@ class Task:
         else:
             return cl()
 
+    def _load_conditional(self, parent: Feature, d: dict):
+        pass
+
     def headers(self) -> list:
         return [fi for f in self.features for fi in f.target]
 

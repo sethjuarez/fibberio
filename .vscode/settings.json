@@ -11,5 +11,6 @@
   "python.linting.flake8Args": [
     "--max-line-length=88"
   ],
-  "prettier.tabWidth": 4
+  "prettier.tabWidth": 4,
+  "editor.tabSize": 2
 }
