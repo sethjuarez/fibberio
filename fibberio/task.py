@@ -1,4 +1,5 @@
 import json
+from typing import Union
 import pandas as pd
 from pathlib import Path
 from .feature import Feature
@@ -6,7 +7,7 @@ from .source import PandasSource
 from .distribution import Distribution
 
 
-class Task:
+class TaskY:
     def __init__(self, desc: str) -> None:
         self.task = Path(desc).absolute().resolve()
         # load modules
@@ -86,3 +87,28 @@ class Task:
             [self.generate_row() for _ in range(count)],
             columns=[f for f in self.headers()],
         )
+
+
+class FeatureBuilder():
+    def __init__(self) -> None:
+        self.module = __import__(self.__module__)
+
+    def create(self, d: Union[dict, list]) -> Distribution:
+        if type(d) == list:
+            # conditional
+            pass
+        else:
+            return self._distribution(d)
+
+    def _distribution(self, d: dict) -> Distribution:
+        if len(d.keys()) != 1:
+            raise KeyError(f"incorrect items in {d}")
+
+        clsname: str = next(iter(d))
+        argsv = d[clsname]
+
+        cl = getattr(self.module, clsname.capitalize())
+        if len(argsv) > 0:
+            return cl(**argsv)
+        else:
+            return cl()

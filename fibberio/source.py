@@ -1,13 +1,8 @@
-import abc
 import pandas as pd
 from pathlib import Path
 
 
-class Source(metaclass=abc.ABCMeta):
-    pass
-
-
-class PandasSource(Source):
+class PandasSource():
     def __init__(self, path: Path, call: str, argsv: dict) -> None:
         self.path = path
         cl = getattr(pd, call)
@@ -16,6 +11,5 @@ class PandasSource(Source):
         else:
             self.df: pd.DataFrame = cl(path)
 
-    def generate(self, features: list[str]) -> list:
-        r = self.df.sample()
-        return [r[item].values[0] for item in features]
+    def sample(self) -> pd.DataFrame:
+        return self.df.sample()

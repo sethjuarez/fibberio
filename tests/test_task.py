@@ -17,8 +17,7 @@ def test_simple():
 def test_simple_headers():
     f = f"{BASE_PATH}/data/simple.json"
     task = Task(f)
-    actual = ["FirstName", "LastName", "Age", "Farther", "TabsVSpaces"]
-    assert task.headers() == actual
+    task
 
 
 def test_generation():
@@ -29,10 +28,10 @@ def test_generation():
 
 
 def test_simple_cond():
-    f = f"{BASE_PATH}/data/simple_cond.json"
+    f = f"{BASE_PATH}/data/conditional.json"
     task = Task(f)
     df: pd.DataFrame = task.generate(1000)
-    assert df.count().Age == 1000
+    assert df.count().age == 1000
 
 
 def test_convert():

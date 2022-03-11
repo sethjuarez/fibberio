@@ -1,10 +1,10 @@
 __version__ = "0.1.3"
 
-from .task import Task
 from .range import RangeParser, Range
-from .feature import Feature
+from .feature import Task
 from .distribution import (
     Distribution,
+    Source,
     Uniform,
     Discrete,
     Normal,
@@ -15,8 +15,8 @@ __all__ = [
     "Range",
     "Task",
     "Distribution",
+    "Source",
     "Uniform",
     "Discrete",
-    "Normal",
-    "Feature"
+    "Normal"
 ]

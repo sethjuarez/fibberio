@@ -1,87 +1,73 @@
 import abc
 import numpy as np
 from time import time
-from typing import Any, Union
-
-module = __import__(__loader__.fullname)
+from .source import PandasSource
+from typing import Any, Tuple
 
 
 class Distribution(metaclass=abc.ABCMeta):
-    def __init__(self) -> None:
-        self.rng = np.random.default_rng(int(time() * 1000))
+    def __init__(self):
+        self.id = ""
 
     @abc.abstractclassmethod
-    def generate(self) -> Any:
+    def generate(self, val=None) -> list[Tuple[str, Any]]:
+        pass
+
+    def conditional(self, desc: dict) -> None:
         pass
 
 
-class Builder():
-    def __init__(self) -> None:
-        self.module = __import__(self.__module__)
-
-    def create(self, d: Union[dict, list]) -> Distribution:
-        if type(d) == list:
-            # conditional
-            pass
-        else:
-            return self._distribution(d)
-
-    def _distribution(self, d: dict) -> Distribution:
-        if len(d.keys()) != 1:
-            raise KeyError(f"incorrect items in {d}")
-
-        clsname: str = next(iter(d))
-        argsv = d[clsname]
-
-        cl = getattr(self.module, clsname.capitalize())
-        if len(argsv) > 0:
-            return cl(**argsv)
-        else:
-            return cl()
-
-
-class DiscreteDistribution(Distribution):
-    def __init__(self, items: list[Any], distribution: list[Union[float, int]]) -> None:
+class Source(Distribution):
+    def __init__(self, id: str, target: str):
         super().__init__()
-        self.distribution = np.array(distribution, dtype=np.float32)
+        self.target = [s.strip() for s in target.split(",")]
+        self.src_id = id
+        self.source: PandasSource = None
+
+    def generate(self, val=None) -> list[Tuple[str, Any]]:
+        r = self.source.sample()
+        return [(item, r[item].values[0]) for item in self.target]
+
+
+class Discrete(Distribution):
+    def __init__(self, **kwargs) -> None:
+        super().__init__()
+        self.rng = np.random.default_rng(int(time() * 1000))
+        self.items = [k for k in kwargs.keys()]
+        self.distribution = np.array(
+            [kwargs[i] for i in kwargs.keys()], dtype=np.float32
+        )
         self.normalized = self.distribution / np.sum(self.distribution)
-        self.items = items
 
-    def generate(self) -> Any:
-        return self.rng.choice(self.items, p=self.normalized)
-
-    def query(self, val, dim) -> float:
-        return self.items.index(val)
+    def generate(self) -> list[Tuple[str, Any]]:
+        return [(self.id, self.rng.choice(self.items, p=self.normalized))]
 
 
-class UniformDistribution(Distribution):
+class Uniform(Distribution):
     def __init__(
         self, low: float, high: float, itype: str = "float", precision: int = 2
     ) -> None:
         super().__init__()
+        self.rng = np.random.default_rng(int(time() * 1000))
         self.low = low
         self.high = high
         self.itype = itype
         self.precision = precision
 
-    def generate(self) -> Union[float, int]:
+    def generate(self) -> list[Tuple[str, Any]]:
         if self.itype == "float":
             d = self.rng.uniform(self.low, self.high)
-            return round(float(d), self.precision)
+            return [(self.id, round(float(d), self.precision))]
         else:
-            return self.rng.integers(self.low, self.high)
+            return [(self.id, self.rng.integers(self.low, self.high))]
 
 
-class NormalDistribution(Distribution):
+class Normal(Distribution):
     def __init__(self, mean: float = 0, stddev: float = 1.0) -> None:
         super().__init__()
+        self.rng = np.random.default_rng(int(time() * 1000))
         self.mean = mean
         self.stddev = stddev
 
     def generate(self) -> float:
-        return self.rng.normal(loc=self.mean, scale=self.stddev)
-
-
-class ConditionalDistribution(Distribution):
-    def __init__(self) -> None:
-        super().__init__()
+        return [(self.id, self.rng.normal(loc=self.mean, scale=self.stddev))]
