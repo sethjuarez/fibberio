@@ -103,6 +103,8 @@ The `sources` section contains a dictionary containing references to external fi
 
 The `key` is the identifier used to reference this data source later in the features. [`read_csv`](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html) in this case is the call to the pandas [`read_csv`](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html) function call with the enclosed dictionary representing the `**kwargs` passed to that function. In theory, any pandas call to load any file type can be used here (although as of the time of this writing, `read_csv` is the only one that has been tried).
 
+The `path` to the data file (in the case above [./full_names.csv](./tests/data/full_names.csv)) is *in relation to the task description file* unless the full path is specified.
+
 ## Features
 
 The `features` section contains the features the system should generate along with their corresponding distributions:
