@@ -1,5 +1,7 @@
 # fibber
 
+(This is still under development)
+
 Teaching machine learning things is hard. The idea behind this library is to generate data in such a way that certain principles can be highlighted without resorting to "finding" the perfect dataset to do so.
 
 Once the library is installed in your python environment, you can start generating data by:
