@@ -4,6 +4,12 @@
 
 Teaching machine learning things is hard. The idea behind this library is to generate data in such a way that certain principles can be highlighted without resorting to "finding" the perfect dataset to do so.
 
+Currently the library can be installed using `pip`:
+
+```
+pip install fibberio
+```
+
 Once the library is installed in your python environment, you can start generating data by:
 
 ```
