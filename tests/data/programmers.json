@@ -1,0 +1,78 @@
+{
+  "sources": {
+    "names": {
+      "path": "./full_names.csv",
+      "read_csv": {
+        "encoding": "unicode_escape",
+        "engine": "python"
+      }
+    }
+  },
+  "features": {
+    "FirstName": {
+      "source": {
+        "id": "names",
+        "target": "FirstName"
+      }
+    },
+    "LastName": {
+      "source": {
+        "id": "names",
+        "target": "LastName"
+      }
+    },
+    "age": {
+      "normal": {
+        "mean": 36,
+        "stddev": 5,
+        "precision": 0
+      }
+    },
+    "style": {
+      "discrete": {
+        "tabs": 2,
+        "spaces": 1
+      },
+      "conditional": {
+        "desc": {
+          "tabs": {
+            "uniform": {
+              "low": 5,
+              "high": 25,
+              "itype": "float",
+              "precision": 2
+            }
+          },
+          "spaces": {
+            "normal": {
+              "mean": 35,
+              "stddev": 0.5
+            }
+          }
+        },
+        "conditional": {
+          "accept": {
+            "[14, 25)": {
+              "discrete": {
+                "True": 1,
+                "False": 1
+              }
+            },
+            "[25, *]": {
+              "discrete": {
+                "True": 23,
+                "False": 2123
+              }
+            },
+            "*": {
+              "discrete": {
+                "True": 2232,
+                "False": 10
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

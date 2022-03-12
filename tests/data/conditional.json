@@ -18,7 +18,8 @@
         "age": {
             "normal": {
                 "mean": 25,
-                "stddev": 1.2
+                "stddev": 1.2,
+                "precision": 4
             }
         },
         "farther": {
@@ -53,7 +54,7 @@
                 "spaces": 2332
             },
             "conditional": {
-                "score": {
+                "score1": {
                     "tabs": {
                         "uniform": {
                             "low": 5,

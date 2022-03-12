@@ -19,9 +19,6 @@ class Task:
         self.files: dict[str, PandasSource] = {}
         self._load_sources(p["sources"])
 
-        # load modules
-        self.module = __import__(self.__module__)
-
         # load features
         features = p["features"]
         self.features = [self._load_feature(id, features[id]) for id in features]
@@ -44,22 +41,7 @@ class Task:
             self.files[key] = PandasSource(path=fp, call=call, argsv=item[call])
 
     def _load_feature(self, id: str, feature: dict) -> Distribution:
-        # check conditionals
-        cond = feature.pop("conditional") if "conditional" in feature else None
-
-        clsname = next(iter(feature))
-        kwargs = feature[clsname]
-
-        cl = getattr(self.module, clsname.capitalize())
-        distribution: Distribution = None
-        if len(kwargs) > 0:
-            distribution = cl(**kwargs)
-        else:
-            distribution = cl()
-
-        distribution.id = id
-        if cond is not None:
-            distribution.conditional(cond)
+        distribution: Distribution = Distribution.build(id, feature)
 
         if type(distribution) == Source:
             if distribution.src_id not in self.files:
@@ -70,7 +52,7 @@ class Task:
 
     def generate(self, count: int) -> pd.DataFrame:
         d = [
-            {t[0]: t[1] for distr in self.features for t in distr.generate()}
+            {k: v for distr in self.features for k, v in distr.generate()}
             for _ in range(count)
         ]
         return pd.DataFrame(d)
