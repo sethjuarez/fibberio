@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fibberio"
-version = "0.1.5"
+version = "0.1.6"
 description = ""
 authors = ["sethjuarez <me@sethjuarez.com>"]
 readme = "README.md"

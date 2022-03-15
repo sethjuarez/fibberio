@@ -110,7 +110,7 @@ class Conditional(Distribution):
                 else:
                     return g
 
-        raise IndexError(f"could not match {val} in conditional")
+        raise IndexError(f'could not match {val} in "{self.id}" conditional')
 
 
 class RangeConditional(Conditional):
@@ -136,7 +136,10 @@ class Source(Distribution):
 
     def generate(self):
         r = self.sample()
-        return [(item, r[item].values[0]) for item in self.target]
+        if len(self.target) == 1:
+            return [(self.id, r[self.target[0]].values[0])]
+        else:
+            return [(item, r[item].values[0]) for item in self.target]
 
 
 class Discrete(Distribution):

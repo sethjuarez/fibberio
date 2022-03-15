@@ -9,13 +9,13 @@
     }
   },
   "features": {
-    "FirstName": {
+    "first_name": {
       "source": {
         "id": "names",
         "target": "FirstName"
       }
     },
-    "LastName": {
+    "last_name": {
       "source": {
         "id": "names",
         "target": "LastName"
@@ -28,46 +28,57 @@
         "precision": 0
       }
     },
+    "location": {
+      "discrete": {
+        "North America": 500,
+        "South America": 200,
+        "Europe": 200,
+        "Africa": 100,
+        "Asia": 100,
+        "Oceania": 100,
+        "Antartica": 1
+      }
+    },
     "style": {
       "discrete": {
-        "tabs": 2,
-        "spaces": 1
+        "tabs": 234,
+        "spaces": 200
       },
       "conditional": {
-        "desc": {
+        "yoe": {
           "tabs": {
             "uniform": {
               "low": 5,
-              "high": 25,
-              "itype": "float",
-              "precision": 2
+              "high": 10,
+              "precision": 0
             }
           },
           "spaces": {
             "normal": {
-              "mean": 35,
-              "stddev": 0.5
+              "mean": 16,
+              "stddev": 2,
+              "precision": 0
             }
           }
         },
         "conditional": {
           "accept": {
-            "[14, 25)": {
+            "[5, 10]": {
               "discrete": {
-                "True": 1,
-                "False": 1
+                "yes": 1,
+                "no": 1
               }
             },
-            "[25, *]": {
+            "[11, 18]": {
               "discrete": {
-                "True": 23,
-                "False": 2123
+                "yes": 23,
+                "no": 2123
               }
             },
-            "*": {
+            "(18, *]": {
               "discrete": {
-                "True": 2232,
-                "False": 10
+                "yes": 2232,
+                "no": 10
               }
             }
           }

@@ -1,6 +1,6 @@
 import os
 import click
-from .feature import Task
+from .task import Task
 from pathlib import Path
 
 
@@ -39,14 +39,17 @@ def cli(task, count, file_type, output):
     itms = f'Generating {count} items using "{desc.name}"'
     print(f'\n{itms}\n{"-"*len(itms)}\n')
 
-    df = task.generate(count)
+    try:
+        df = task.generate(count)
+        stats = df.describe(include='all')
+        print(stats)
 
-    stats = df.describe(include='all')
-    print(stats)
+        out = normalize_path(output, create_dir=True)
+        print(f'\nSaving {file_type} to {str(out)}')
+        if file_type == 'csv':
+            df.to_csv(str(out))
 
-    out = normalize_path(output, create_dir=True)
-    print(f'\nSaving {file_type} to {str(out)}')
-    if file_type == 'csv':
-        df.to_csv(str(out))
+    except Exception as e:
+        print(f'Looks like there was a problem:\n\n{e}\n')
 
     print('Task complete\n')
