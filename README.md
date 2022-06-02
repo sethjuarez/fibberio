@@ -226,10 +226,10 @@ Feature conditionals allow for conditional sampling based on the parent distribu
 
 This describes `score` feature conditioned on the `age` feature. Since the parent distribution is continuous, the conditional subdivisions should be represented by ranges:
 
-- $$[a, b]$$ the closed interval $${ x \in \mathbb{R}: a \le x \le b }$$
-- $$[a, b)$$ the interval $${ x \in \mathbb{R}: a \le x \lt b }$$
-- $$(a, b]$$ the interval $${ x \in \mathbb{R}: a \lt x \le b }$$
-- $$(a, b)$$ the open interval $${ x \in \mathbb{R}: a \lt x \lt b }$$
+- $[a, b]$ the closed interval ${ x \in \mathbb{R}: a \le x \le b }$
+- $[a, b)$ the interval ${ x \in \mathbb{R}: a \le x \lt b }$
+- $(a, b]$ the interval ${ x \in \mathbb{R}: a \lt x \le b }$
+- $(a, b)$ the open interval ${ x \in \mathbb{R}: a \lt x \lt b }$
 
 with `*` representing a catch within the range interval or as the "catch-all" - these are processed in order and an exception is raised if none of the criteria fit.
 
