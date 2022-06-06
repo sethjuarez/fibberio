@@ -19,6 +19,7 @@ pytest = "^5.2"
 flake8 = "^4.0.1"
 mypy = "^0.931"
 black = "^22.1.0"
+python-semantic-release = "^7.29.1"
 
 
 [build-system]
@@ -27,3 +28,13 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 fibber = "fibberio.cli:cli"
+
+[tool.semantic_release]
+version_variable = [
+    "fibberio/__init__.py:__version__",
+    "pyproject.toml:version"
+]
+branch = "main"
+upload_to_pypi = false
+upload_to_release = true
+build_command = "pip install poetry && poetry build"
