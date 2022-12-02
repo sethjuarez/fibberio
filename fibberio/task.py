@@ -5,6 +5,11 @@ from .source import PandasSource
 from .distribution import Distribution, Source
 
 
+class TaskF:
+    def __init__(self, sources: list[PandasSource], features: list[Distribution]) -> None:
+        pass
+
+
 class Task:
     def __init__(self, f: str) -> None:
         self.task = Path(f).absolute().resolve()
