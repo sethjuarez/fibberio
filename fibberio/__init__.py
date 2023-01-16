@@ -10,6 +10,11 @@ from .distribution import (
     Normal,
 )
 
+from .source import (
+    DataSource,
+    Pandas,
+)
+
 __all__ = [
     "RangeParser",
     "Range",
@@ -18,5 +23,7 @@ __all__ = [
     "Source",
     "Uniform",
     "Discrete",
-    "Normal"
+    "Normal",
+    "DataSource"
+    "Pandas"
 ]
