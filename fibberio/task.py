@@ -1,6 +1,4 @@
-import sys
 import json
-from typing import Any, Dict, Tuple
 import pandas as pd
 from pathlib import Path
 from .source import PandasSource
@@ -31,23 +29,9 @@ class Task:
         self.features = [self._load_feature(id, features[id]) for id in features]
 
     @staticmethod
-    def build(item: Dict[str, Any]) -> Tuple[str, Any]:
-        # item = json.loads(data)
-
-        # retrieve id
-        id = item.pop("id")
-
-        # class and args
-        clsname = next(iter(item))
-        kwargs = item[clsname]
-        cl = getattr(sys.modules["fibberio"], clsname.capitalize())
-        cls = cl(**kwargs)
-        return id, cls
-    
-    @staticmethod
     def path(f: str) -> Path:
         return Path(f).absolute().resolve()
-        
+
     def _load_sources(self, sources: dict) -> None:
         for key in sources.keys():
             if key in self.files:

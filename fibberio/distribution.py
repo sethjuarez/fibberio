@@ -1,10 +1,10 @@
-import sys
 import abc
 import numpy as np
 from time import time
 from .range import Range, RangeParser
-from typing import Any, Tuple
+from typing import Any, List, Tuple, Union
 from .source import PandasSource
+from .helpers import Item
 
 parser = RangeParser()
 
@@ -23,77 +23,47 @@ class Distribution(metaclass=abc.ABCMeta):
     def sample(self) -> Any:
         pass
 
-    @staticmethod
-    def build(id: str, feature: dict):
-        # check conditional
-        cond = feature.pop("conditional") if "conditional" in feature else None
 
-        # class and args
-        clsname = next(iter(feature))
-        kwargs = feature[clsname]
+class Condition:
+    def __init__(self, marginal: Union[Range, int, float, str], posterior: Distribution):
+        self.marginal = marginal
+        self.posterior = posterior
 
-        # create
-        cl = getattr(sys.modules["fibberio"], clsname.capitalize())
-        distribution: Distribution = cl.create(kwargs)
-        distribution.id = id
-
-        # create conditional
-        if cond is not None:
-            distribution.conditional = cond
-
-        return distribution
-
-    @property
-    def conditional(self):
-        return self._conditional
-
-    @conditional.setter
-    def conditional(self, desc) -> None:
-        # nothing to do
-        if desc is None:
-            return
-        elif type(desc) == Distribution:
-            self._conditional = desc
+    def check(self, val):
+        if type(self.marginal) == Range:
+            return self.marginal.check(val)
         else:
-            # pull conditional off if exists
-            cond = desc.pop("conditional") if "conditional" in desc else None
-            key = next(iter(desc))
-            val: dict = desc[key]
-            if self.discrete:
-                self._conditional = Conditional()
-                self._conditional.values = [k for k in val.keys()]
-            else:
-                self._conditional = RangeConditional()
-                self._conditional.ranges = [parser.parse(k) for k in val.keys()]
+            return self.marginal == val or self.marginal == "*"
 
-            self._conditional.id = key
-            self._conditional.distributions = [
-                Distribution.build(key, v) for v in val.values()
-            ]
-
-            # only discrete if all d's are discrete
-            self._conditional.discrete = all(
-                d.discrete for d in self._conditional.distributions
-            )
-
-            self._conditional.conditional = cond
-
-    @classmethod
-    def create(cls, kwargs):
-        if len(kwargs) > 0:
-            return cls(**kwargs)
+    def generate(self, val) -> list[Tuple[str, Any]]:
+        if self.check(val):
+            return self.posterior.generate()
         else:
-            return cls
+            raise ValueError(f'marginal "{self.marginal}" does not match "{val}"')
 
 
 class Conditional(Distribution):
-    def __init__(self):
+    def __init__(self, marginal: str, posterior: Union[List[Condition], List[dict]]):
         super().__init__()
-        self.values: list[Any] = []
-        self.distributions: list[Distribution] = []
+        self.marginal = marginal
+        self.posterior = []
+        isRange = False
+        for item in posterior:
+            if type(item) == dict:
+                v = item.pop("value")
+                if v.find("[") > -1 or v.find("(") > -1:
+                    v = parser.parse(v)
+                    isRange = True
 
-    def check(self, idx, val) -> bool:
-        return self.values[idx] == val or self.values[idx] == "*"
+                elif isRange and v == "*":
+                    v = parser.parse(v)
+
+                # id doesn't matter here
+                _, distr = Item.build(item)
+
+                self.posterior.append(Condition(v, distr))
+            else:
+                self.posterior.append(item)
 
     def sample(self) -> Any:
         pass
@@ -102,32 +72,18 @@ class Conditional(Distribution):
         if len(val) > 1:
             raise Exception(f"{val} too complex to conditionally process")
 
-        for i in range(len(self.distributions)):
-            if self.check(i, val[0][1]):
-                g = self.distributions[i].generate()
-                if self.conditional is not None:
-                    return g + self.conditional.generate(g)
-                else:
-                    return g
+        for i in range(len(self.conditionals)):
+            if self.conditionals[i].check(val[0][1]):
+                return self.conditionals[i].generate(val[0][1])
 
-        raise IndexError(f'could not match {val} in "{self.id}" conditional')
-
-
-class RangeConditional(Conditional):
-    def __init__(self):
-        super().__init__()
-        self.ranges: list[Range] = []
-        self.distributions: list[Distribution] = []
-
-    def check(self, idx, val) -> bool:
-        return self.ranges[idx].check(val)
+        raise IndexError(f'could not marginal "{val}" in "{self.id}" conditional')
 
 
 class Source(Distribution):
-    def __init__(self, id: str, target: str):
+    def __init__(self, id: str, target: Union[str, List[str]]):
         super().__init__()
         self.discrete = True
-        self.target = [s.strip() for s in target.split(",")]
+        self.target = target if type(target) == list else [s.strip() for s in target.split(",")]
         self.src_id = id
         self.source: PandasSource = None
 
@@ -148,9 +104,7 @@ class Discrete(Distribution):
         self.discrete = True
         self.rng = np.random.default_rng(int(time() * 1000))
         self.items = [k for k in kwargs.keys()]
-        self.distribution = np.array(
-            [kwargs[i] for i in kwargs.keys()], dtype=np.float32
-        )
+        self.distribution = np.array([kwargs[i] for i in kwargs.keys()], dtype=np.float32)
         self.normalized = self.distribution / np.sum(self.distribution)
 
     def sample(self) -> Any:
@@ -158,9 +112,7 @@ class Discrete(Distribution):
 
 
 class Uniform(Distribution):
-    def __init__(
-        self, low: float, high: float, itype: str = "float", precision: int = 2
-    ) -> None:
+    def __init__(self, low: float, high: float, itype: str = "float", precision: int = 2) -> None:
         super().__init__()
         self.rng = np.random.default_rng(int(time() * 1000))
         self.low = low
@@ -177,9 +129,7 @@ class Uniform(Distribution):
 
 
 class Normal(Distribution):
-    def __init__(
-        self, mean: float = 0, stddev: float = 1.0, precision: int = 2
-    ) -> None:
+    def __init__(self, mean: float = 0, stddev: float = 1.0, precision: int = 2) -> None:
         super().__init__()
         self.rng = np.random.default_rng(int(time() * 1000))
         self.mean = mean
