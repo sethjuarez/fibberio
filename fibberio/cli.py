@@ -47,7 +47,7 @@ def cli(task, count, file_type, output):
         out = normalize_path(output, create_dir=True)
         print(f'\nSaving {file_type} to {str(out)}')
         if file_type == 'csv':
-            df.to_csv(str(out))
+            df.to_csv(str(out), index=False)
 
     except Exception as e:
         print(f'Looks like there was a problem:\n\n{e}\n')
