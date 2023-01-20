@@ -1,5 +1,7 @@
 # Post-Gen Tasks
 
+(**Still under consideration/construction**)
+
 Here are some ideas for some post gen tasks:
 
 1. Blend Columns with additions
@@ -28,7 +30,7 @@ Allowed operations for column blending:
 ### Discrete
 1. ?
 
-# Feature + Distribution
+# Feature `op` Distribution
 
 Adding uniform noise to col 2
 
@@ -39,7 +41,6 @@ Adding uniform noise to col 2
 
 ```json
 {
-  "post": {
     "col 2": {
       "source": {
         "normal": {
@@ -51,7 +52,7 @@ Adding uniform noise to col 2
       "target": "col2noise",
       "operation": "add"
     }
-  }
+  ]
 }
 ```
 
@@ -59,3 +60,6 @@ Adding uniform noise to col 2
 | ------------ | ----- | ----- | --------- |
 | Juicy Apples | 1.99  | 7     | 2.33      |
 | Bananas      | 1.89  | 5234  | 2.45      |
+
+
+# Feature `op` Feature
