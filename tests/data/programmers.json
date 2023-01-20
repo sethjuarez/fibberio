@@ -1,89 +1,110 @@
 {
-  "sources": {
-    "names": {
-      "path": "./full_names.csv",
-      "read_csv": {
-        "encoding": "unicode_escape",
-        "engine": "python"
-      }
-    }
-  },
-  "features": {
-    "first_name": {
-      "source": {
-        "id": "names",
-        "target": "FirstName"
-      }
-    },
-    "last_name": {
-      "source": {
-        "id": "names",
-        "target": "LastName"
-      }
-    },
-    "age": {
-      "normal": {
-        "mean": 36,
-        "stddev": 5,
-        "precision": 0
-      }
-    },
-    "location": {
-      "discrete": {
-        "North America": 500,
-        "South America": 200,
-        "Europe": 200,
-        "Africa": 100,
-        "Asia": 100,
-        "Oceania": 100,
-        "Antartica": 1
-      }
-    },
-    "style": {
-      "discrete": {
-        "tabs": 234,
-        "spaces": 200
-      },
-      "conditional": {
-        "yoe": {
-          "tabs": {
-            "uniform": {
-              "low": 5,
-              "high": 10,
-              "precision": 0
+    "sources": [
+        {
+            "id": "names",
+            "pandas": {
+                "path": "./full_names.csv",
+                "read_csv": {
+                    "encoding": "unicode_escape",
+                    "engine": "python"
+                }
             }
-          },
-          "spaces": {
-            "normal": {
-              "mean": 16,
-              "stddev": 2,
-              "precision": 0
-            }
-          }
-        },
-        "conditional": {
-          "accept": {
-            "[5, 10]": {
-              "discrete": {
-                "yes": 1,
-                "no": 1
-              }
-            },
-            "[11, 18]": {
-              "discrete": {
-                "yes": 23,
-                "no": 2123
-              }
-            },
-            "(18, *]": {
-              "discrete": {
-                "yes": 2232,
-                "no": 10
-              }
-            }
-          }
         }
-      }
-    }
-  }
+    ],
+    "features": [
+        {
+            "id": "first_name",
+            "source": {
+                "id": "names",
+                "target": "FirstName"
+            }
+        },
+        {
+            "id": "last_name",
+            "source": {
+                "id": "names",
+                "target": "LastName"
+            }
+        },
+        {
+            "id": "age",
+            "normal": {
+                "mean": 36,
+                "stddev": 5,
+                "precision": 0
+            }
+        },
+        {
+            "id": "location",
+            "discrete": {
+                "North America": 500,
+                "South America": 200,
+                "Europe": 200,
+                "Africa": 100,
+                "Asia": 100,
+                "Oceania": 100,
+                "Antartica": 1
+            }
+        },
+        {
+            "id": "style",
+            "discrete": {
+                "tabs": 234,
+                "spaces": 200
+            }
+        },
+        {
+            "id": "yoe",
+            "conditional": {
+                "marginal": "style",
+                "posterior": [
+                    {
+                        "value": "tabs",
+                        "uniform": {
+                            "low": 5,
+                            "high": 10,
+                            "precision": 0
+                        }
+                    },
+                    {
+                        "value": "spaces",
+                        "normal": {
+                            "mean": 16,
+                            "stddev": 2,
+                            "precision": 0
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "id": "accept",
+            "conditional": {
+                "marginal": "yoe",
+                "posterior": [
+                    {
+                        "value": "[5, 10]",
+                        "discrete": {
+                            "yes": 1,
+                            "no": 1
+                        }
+                    },
+                    {
+                        "value": "[11, 18]",
+                        "discrete": {
+                            "yes": 23,
+                            "no": 2123
+                        }
+                    },
+                    {
+                        "value": "(18, *]",
+                        "discrete": {
+                            "yes": 2232,
+                            "no": 10
+                        }
+                    }
+                ]
+            }
+        }
+    ]
 }

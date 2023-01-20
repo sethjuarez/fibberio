@@ -1,67 +1,55 @@
 import json
+from typing import Any
 import pandas as pd
 from pathlib import Path
-from .source import PandasSource
 from .distribution import Distribution, Source
-
-
-class TaskF:
-    def __init__(self) -> None:
-        pass
+from .helpers import Item
 
 
 class Task:
-    def __init__(self, f: str) -> None:
-        self.task = Path(f).absolute().resolve()
+    def __init__(self, file: str = None) -> None:
+        self.path = Path(__file__).absolute().parent.as_posix()
+        self.sources: dict[str, Source] = {}
+        self.features: dict[str, Distribution] = {}
+        if file is not None:
+            self.load(file)
 
-        if not self.task.exists():
-            raise FileNotFoundError(f"{str(self.task)} does not exist")
+    def load(self, file: str) -> None:
+        self.file = Path(file).absolute().resolve()
+
+        if not self.file.exists():
+            raise FileNotFoundError(f"{str(self.file)} does not exist")
+
+        # for relative file pathing
+        self.path = Path(file).absolute().parent.resolve()
 
         # load description
-        p = json.loads(self.task.read_text())
+        task = json.loads(self.file.read_text())
 
-        # load sources
-        self.files: dict[str, PandasSource] = {}
-        self._load_sources(p["sources"])
+        # load sources - add path for rel paths
+        sources = [Item.build(s, self.path) for s in task["sources"]]
+        self.sources = {id: o for id, o in sources}
 
         # load features
-        features = p["features"]
-        self.features = [self._load_feature(id, features[id]) for id in features]
+        features = [Item.build(s) for s in task["features"]]
+        self.features = {id: o for id, o in features}
 
-    @staticmethod
-    def path(f: str) -> Path:
-        return Path(f).absolute().resolve()
+        # hidrate "source" features
+        for k in self.features.keys():
+            # set up referential integrity
+            self.features[k].id = k
+            if type(self.features[k]) == Source:
+                if self.features[k].src in self.sources:
+                    self.features[k].source = self.sources[self.features[k].src]
+                else:
+                    raise ValueError(f"Source {self.features[k].src} not found in data sources")
 
-    def _load_sources(self, sources: dict) -> None:
-        for key in sources.keys():
-            if key in self.files:
-                raise KeyError(f"{key} already exists")
-
-            item = sources[key]
-            fp = Path(item.pop("path"))
-            if not fp.is_absolute():
-                fp = self.task.parent.joinpath(fp)
-
-            fp = fp.absolute().resolve()
-            if not fp.exists():
-                raise FileNotFoundError(f'source "{key}" file {fp} does not exist')
-
-            call: str = next(iter(item))
-            self.files[key] = PandasSource(path=fp, call=call, argsv=item[call])
-
-    def _load_feature(self, id: str, feature: dict) -> Distribution:
-        distribution: Distribution = Distribution.build(id, feature)
-
-        if type(distribution) == Source:
-            if distribution.src_id not in self.files:
-                raise KeyError(f"{distribution.src_id} source reference does not exist")
-            distribution.source = self.files[distribution.src_id]
-
-        return distribution
+    def sample(self) -> dict[str, Any]:
+        d = {}
+        for _, feature in self.features.items():
+            # generate new data while passing in existing data
+            d = {**d, **{k: v for k, v in feature.generate(**d)}}
+        return d
 
     def generate(self, count: int) -> pd.DataFrame:
-        d = [
-            {k: v for distr in self.features for k, v in distr.generate()}
-            for _ in range(count)
-        ]
-        return pd.DataFrame(d)
+        return pd.DataFrame([self.sample() for _ in range(count)])

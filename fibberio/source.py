@@ -16,15 +16,8 @@ class DataSource(metaclass=abc.ABCMeta):
         pass
 
 
-class PandasSource:
-    pass
-
-
 class Pandas(DataSource):
-    def __init__(self, **kwargs) -> None:
-        # retrieve path
-        path = kwargs.pop("path")
-
+    def __init__(self, path, **kwargs) -> None:
         # retrieve pandas call
         call = next(iter(kwargs))
         kw = kwargs[call]
@@ -37,6 +30,5 @@ class Pandas(DataSource):
     def load(self):
         pass
 
-    def sample(self, *args):
-        r = self.df.sample()
-        return [r[item].values[0] for item in args]
+    def sample(self):
+        return self.df.sample()

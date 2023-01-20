@@ -1,23 +1,30 @@
 import abc
 import numpy as np
 from time import time
+from .helpers import Item
+from .source import DataSource
 from .range import Range, RangeParser
 from typing import Any, List, Tuple, Union
-from .source import PandasSource
-from .helpers import Item
 
 parser = RangeParser()
 
 
 class Distribution(metaclass=abc.ABCMeta):
     def __init__(self):
-        self.id = ""
+        self._id = ""
         self.discrete = False
         self._conditional: Distribution = None
 
-    def generate(self, val=None) -> list[Tuple[str, Any]]:
-        val = [(self.id, self.sample())]
-        return val if self.conditional is None else val + self.conditional.generate(val)
+    @property
+    def id(self):
+        return self._id
+
+    @id.setter
+    def id(self, value):
+        self._id = value
+
+    def generate(self, **kwargs) -> list[Tuple[str, Any]]:
+        return [(self.id, self.sample())]
 
     @abc.abstractclassmethod
     def sample(self) -> Any:
@@ -60,37 +67,47 @@ class Conditional(Distribution):
 
                 # id doesn't matter here
                 _, distr = Item.build(item)
-
                 self.posterior.append(Condition(v, distr))
             else:
                 self.posterior.append(item)
 
+    @property
+    def id(self):
+        return self._id
+
+    @id.setter
+    def id(self, value):
+        self._id = value
+        for item in self.posterior:
+            item.posterior.id = value
+
     def sample(self) -> Any:
         pass
 
-    def generate(self, val=None) -> list[Tuple[str, Any]]:
-        if len(val) > 1:
-            raise Exception(f"{val} too complex to conditionally process")
+    def generate(self, **kwargs) -> list[Tuple[str, Any]]:
+        if self.marginal not in kwargs:
+            raise KeyError(f'could not find marginal "{self.marginal}" in generated data')
 
-        for i in range(len(self.conditionals)):
-            if self.conditionals[i].check(val[0][1]):
-                return self.conditionals[i].generate(val[0][1])
+        val = kwargs[self.marginal]
 
-        raise IndexError(f'could not marginal "{val}" in "{self.id}" conditional')
+        for i in range(len(self.posterior)):
+            if self.posterior[i].check(val):
+                return self.posterior[i].generate(val)
+
+        raise IndexError(f'could not find marginal "{val}" in "{self.id}" conditional')
 
 
 class Source(Distribution):
     def __init__(self, id: str, target: Union[str, List[str]]):
         super().__init__()
-        self.discrete = True
         self.target = target if type(target) == list else [s.strip() for s in target.split(",")]
-        self.src_id = id
-        self.source: PandasSource = None
+        self.src = id
+        self.source: DataSource = None
 
     def sample(self):
         return self.source.sample()
 
-    def generate(self):
+    def generate(self, **kwargs) -> list[Tuple[str, Any]]:
         r = self.sample()
         if len(self.target) == 1:
             return [(self.id, r[self.target[0]].values[0])]
