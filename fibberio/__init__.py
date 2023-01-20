@@ -1,6 +1,7 @@
 __version__ = "0.1.6"
 
 from .range import RangeParser, Range
+from .helpers import Item
 from .task import Task
 from .distribution import (
     Distribution,
@@ -8,6 +9,13 @@ from .distribution import (
     Uniform,
     Discrete,
     Normal,
+    Conditional,
+    
+)
+
+from .source import (
+    DataSource,
+    Pandas,
 )
 
 __all__ = [
@@ -18,5 +26,9 @@ __all__ = [
     "Source",
     "Uniform",
     "Discrete",
-    "Normal"
+    "Normal",
+    "DataSource"
+    "Pandas"
+    "Conditional"
+    "Item"
 ]

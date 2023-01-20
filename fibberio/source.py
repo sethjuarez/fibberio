@@ -1,15 +1,34 @@
+import abc
 import pandas as pd
-from pathlib import Path
+from typing import Any
 
 
-class PandasSource():
-    def __init__(self, path: Path, call: str, argsv: dict) -> None:
-        self.path = path
+class DataSource(metaclass=abc.ABCMeta):
+    def __init__(self) -> None:
+        pass
+
+    @abc.abstractclassmethod
+    def load(self) -> Any:
+        pass
+
+    @abc.abstractclassmethod
+    def sample(self) -> Any:
+        pass
+
+
+class Pandas(DataSource):
+    def __init__(self, path, **kwargs) -> None:
+        # retrieve pandas call
+        call = next(iter(kwargs))
+        kw = kwargs[call]
         cl = getattr(pd, call)
-        if len(argsv) > 0:
-            self.df: pd.DataFrame = cl(path, **argsv)
+        if len(kw) > 0:
+            self.df: pd.DataFrame = cl(path, **kw)
         else:
             self.df: pd.DataFrame = cl(path)
 
-    def sample(self) -> pd.DataFrame:
+    def load(self):
+        pass
+
+    def sample(self):
         return self.df.sample()
