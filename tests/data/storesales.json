@@ -1,0 +1,116 @@
+{
+    "sources": [],
+    "features": [
+        {
+            "id": "store",
+            "discrete": {
+                "Glendale": 1,
+                "Pasadena": 1,
+                "Burbank": 1,
+                "Thousand Oaks": 1,
+                "Valencia": 1
+            }
+        },
+        {
+            "id": "sales",
+            "conditional": {
+                "marginal": "store",
+                "posterior": [
+                    {
+                        "value": "Glendale",
+                        "gbm": {
+                            "start": 212322,
+                            "drift": 0.01,
+                            "volatility": 0.4,
+                            "precision": 2
+                        }
+                    },
+                    {
+                        "value": "Pasadena",
+                        "gbm": {
+                            "start": 13233,
+                            "drift": 0.01,
+                            "volatility": 0.4,
+                            "precision": 2
+                        }
+                    },
+                    {
+                        "value": "Burbank",
+                        "gbm": {
+                            "start": 54665,
+                            "drift": 0.01,
+                            "volatility": 0.1,
+                            "precision": 2
+                        }
+                    },
+                    {
+                        "value": "Thousand Oaks",
+                        "gbm": {
+                            "start": 25433,
+                            "drift": 0.01,
+                            "volatility": 0.3,
+                            "precision": 2
+                        }
+                    },
+                    {
+                        "value": "Valencia",
+                        "gbm": {
+                            "start": 12922,
+                            "drift": 0.01,
+                            "volatility": 0.6,
+                            "precision": 2
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "id": "date",
+            "conditional": {
+                "marginal": "store",
+                "posterior": [
+                    {
+                        "value": "Glendale",
+                        "time": {
+                            "start": "2021-11-21",
+                            "format": "%Y-%m-%d",
+                            "days": 1
+                        }
+                    },
+                    {
+                        "value": "Pasadena",
+                        "time": {
+                            "start": "2021-11-21",
+                            "format": "%Y-%m-%d",
+                            "days": 1
+                        }
+                    },
+                    {
+                        "value": "Burbank",
+                        "time": {
+                            "start": "2021-11-21",
+                            "format": "%Y-%m-%d",
+                            "days": 1
+                        }
+                    },
+                    {
+                        "value": "Thousand Oaks",
+                        "time": {
+                            "start": "2021-11-21",
+                            "format": "%Y-%m-%d",
+                            "days": 1
+                        }
+                    },
+                    {
+                        "value": "Valencia",
+                        "time": {
+                            "start": "2021-11-21",
+                            "format": "%Y-%m-%d",
+                            "days": 1
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from fibberio import Discrete, Uniform, Normal, Source, Conditional, Item
+from fibberio import Discrete, Uniform, Normal, Source, Conditional, Item, GBM, Time
 
 BASE_PATH = str(Path(__file__).absolute().parent.as_posix())
 
@@ -55,6 +55,42 @@ def test_normal_load():
     id, distribution = Item.build(json.loads(item))
     assert id == "age"
     assert isinstance(distribution, Normal)
+
+
+def test_gbm_load():
+    item = (
+        "{"
+        '    "id": "timeseries",'
+        '    "gbm": {'
+        '      "period": 1,'
+        '      "start": 100,'
+        '      "drift": 0.01,'
+        '      "volatility": 0.06,'
+        '      "precision": 2'
+        '    }'
+        '}'
+    )
+    d = json.loads(item)
+    id, distribution = Item.build(d)
+    assert id == "timeseries"
+    assert isinstance(distribution, GBM)
+
+
+def test_time_load():
+    item = (
+        "{"
+        '    "id": "date",'
+        '    "time": {'
+        '      "start": "2021-11-21",'
+        '      "format": "%Y-%m-%d",'
+        '      "days": 1'
+        '    }'
+        '}'
+    )
+    d = json.loads(item)
+    id, distribution = Item.build(d)
+    assert id == "date"
+    assert isinstance(distribution, Time)
 
 
 def test_source_load():

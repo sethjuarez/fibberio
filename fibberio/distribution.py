@@ -1,9 +1,11 @@
 import abc
+import math
 import numpy as np
 from time import time
 from .helpers import Item
 from .source import DataSource
 from .range import Range, RangeParser
+from datetime import datetime, timedelta
 from typing import Any, List, Tuple, Union
 
 parser = RangeParser()
@@ -156,3 +158,44 @@ class Normal(Distribution):
     def sample(self) -> Any:
         d = self.rng.normal(loc=self.mean, scale=self.stddev)
         return round(d, self.precision)
+
+
+class GBM(Distribution):
+    def __init__(
+        self, start: float = 0, drift: float = 1, volatility: float = 0.8, period: float = 0.1, precision: int = 2
+    ) -> None:
+        super().__init__()
+        self.period = period
+        self.drift = drift
+        self.volatility = volatility
+        self.precision = precision
+        self.current = start
+
+    def sample(self) -> Any:
+        next_val = (self.drift - 0.5 * self.volatility**2) * self.period + self.volatility * np.random.normal(
+            0, math.sqrt(self.period)
+        )
+        self.current = self.current * math.exp(next_val)
+        return round(self.current, self.precision)
+
+
+class Time(Distribution):
+    def __init__(
+        self, start: str, format: str, days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0
+    ) -> None:
+        super().__init__()
+        self.format = format
+        self.delta = timedelta(
+            days=days,
+            seconds=seconds,
+            microseconds=microseconds,
+            milliseconds=milliseconds,
+            minutes=minutes,
+            hours=hours,
+            weeks=weeks,
+        )
+        self.current = datetime.strptime(start, self.format)
+
+    def sample(self) -> Any:
+        self.current += self.delta
+        return self.current.strftime(self.format)

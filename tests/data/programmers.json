@@ -13,14 +13,14 @@
     ],
     "features": [
         {
-            "id": "first_name",
+            "id": "firstname",
             "source": {
                 "id": "names",
                 "target": "FirstName"
             }
         },
         {
-            "id": "last_name",
+            "id": "lastname",
             "source": {
                 "id": "names",
                 "target": "LastName"
@@ -44,6 +44,14 @@
                 "Asia": 100,
                 "Oceania": 100,
                 "Antartica": 1
+            }
+        },
+        {
+            "id": "orgsz",
+            "normal": {
+                "mean": 500,
+                "stddev": 200,
+                "precision": 0
             }
         },
         {
@@ -71,6 +79,38 @@
                         "normal": {
                             "mean": 16,
                             "stddev": 2,
+                            "precision": 0
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "id": "projects",
+            "conditional": {
+                "marginal": "yoe",
+                "posterior": [
+                    {
+                        "value": "[5, 10]",
+                        "normal": {
+                            "mean": 5,
+                            "stddev": 1,
+                            "precision": 0
+                        }
+                    },
+                    {
+                        "value": "[11, 18]",
+                        "normal": {
+                            "mean": 10,
+                            "stddev": 2,
+                            "precision": 0
+                        }
+                    },
+                    {
+                        "value": "(18, *]",
+                        "normal": {
+                            "mean": 20,
+                            "stddev": 5,
                             "precision": 0
                         }
                     }

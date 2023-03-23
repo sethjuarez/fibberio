@@ -1,4 +1,5 @@
 import sys
+import inspect
 from pathlib import Path
 from typing import Any, Dict, Tuple
 
@@ -18,7 +19,15 @@ class Item:
         # class and args
         clsname = next(iter(item))
         kwargs = item[clsname]
-        cl = getattr(sys.modules["fibberio"], clsname.capitalize())
+        attr_name = [
+            s
+            for s in dir(sys.modules["fibberio"])
+            if s.lower() == clsname.lower() and inspect.isclass(getattr(sys.modules["fibberio"], s))
+        ]
+        if len(attr_name) != 1:
+            raise ValueError(f"Unknown type: {clsname}")
+
+        cl = getattr(sys.modules["fibberio"], attr_name[0])
 
         # sort relative paths
         if "path" in kwargs:

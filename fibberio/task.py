@@ -8,7 +8,6 @@ from .helpers import Item
 
 class Task:
     def __init__(self, file: str = None) -> None:
-        self.path = Path(__file__).absolute().parent.as_posix()
         self.sources: dict[str, Source] = {}
         self.features: dict[str, Distribution] = {}
         if file is not None:
@@ -21,13 +20,13 @@ class Task:
             raise FileNotFoundError(f"{str(self.file)} does not exist")
 
         # for relative file pathing
-        self.path = Path(file).absolute().parent.resolve()
+        path = Path(file).absolute().parent.resolve()
 
         # load description
         task = json.loads(self.file.read_text())
 
         # load sources - add path for rel paths
-        sources = [Item.build(s, self.path) for s in task["sources"]]
+        sources = [Item.build(s, path) for s in task["sources"]]
         self.sources = {id: o for id, o in sources}
 
         # load features
