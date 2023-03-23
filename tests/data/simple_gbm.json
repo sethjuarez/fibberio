@@ -1,0 +1,62 @@
+{
+    "sources": [],
+    "features": [
+        {
+            "id": "store",
+            "discrete": {
+                "store_1": 1,
+                "store_2": 1
+            }
+        },
+        {
+            "id": "sales",
+            "conditional": {
+                "marginal": "store",
+                "posterior": [
+                    {
+                        "value": "store_1",
+                        "gbm": {
+                            "start": 212322,
+                            "drift": 0.01,
+                            "volatility": 0.4,
+                            "precision": 2
+                        }
+                    },
+                    {
+                        "value": "store_2",
+                        "gbm": {
+                            "start": 13233,
+                            "drift": 0.01,
+                            "volatility": 0.4,
+                            "precision": 2
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "id": "date",
+            "conditional": {
+                "marginal": "store",
+                "posterior": [
+                    {
+                        "value": "store_1",
+                        "time": {
+                            "start": "2021-11-21",
+                            "format": "%Y-%m-%d",
+                            "days": 1
+                        }
+                    },
+                    {
+                        "value": "store_2",
+                        "time": {
+                            "start": "2021-11-21",
+                            "format": "%Y-%m-%d",
+                            "days": 1
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

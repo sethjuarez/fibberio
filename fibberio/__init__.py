@@ -10,7 +10,8 @@ from .distribution import (
     Discrete,
     Normal,
     Conditional,
-    
+    GBM,
+    Time
 )
 
 from .source import (
@@ -30,5 +31,6 @@ __all__ = [
     "DataSource"
     "Pandas"
     "Conditional"
-    "Item"
+    "Item",
+    "GBM",
 ]

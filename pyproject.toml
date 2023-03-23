@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fibberio"
-version = "1.0.0"
+version = "1.1.0"
 description = ""
 authors = ["sethjuarez <me@sethjuarez.com>"]
 readme = "README.md"
@@ -21,6 +21,7 @@ mypy = "^0.931"
 black = "^22.1.0"
 python-semantic-release = "^7.29.1"
 pyment = "^0.3.3"
+ipykernel = "^6.22.0"
 
 
 [build-system]
