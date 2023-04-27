@@ -33,6 +33,9 @@ class Task:
         features = [Item.build(s) for s in task["features"]]
         self.features = {id: o for id, o in features}
 
+        self.validate()
+
+    def validate(self) -> None:
         # hidrate "source" features
         for k in self.features.keys():
             # set up referential integrity
